@@ -52,13 +52,31 @@ export function PuzzleBriefing({ lines }) {
   const [currentLine, setCurrentLine] = useState(0);
 
   useEffect(() => {
+    /**
+     * Calculate the duration for each line based on its length.
+     * This effect runs whenever the current line changes.
+     * @param {string} line - The current line of text.
+     * @returns {number} The duration in milliseconds for the line to be displayed.
+     */
+    const calculateDuration = (line) => {
+      if (!line || line.trim() === "") {
+        return 1500;
+      }
+      const wordCount = line.split(" ").length;
+      const duration = 1500 + wordCount * 300;
+      return Math.min(duration, 8000);
+    };
+
     if (currentLine < lines.length - 1) {
+      const duration = calculateDuration(lines[currentLine]);
       const timer = setTimeout(() => {
         setCurrentLine(currentLine + 1);
-      }, 2500);
+      }, duration);
+      // Clear the timer when the component unmounts or when currentLine changes
       return () => clearTimeout(timer);
     } else {
-      const finalTimer = setTimeout(goToPuzzle, 2500);
+      const duration = calculateDuration(lines[currentLine]);
+      const finalTimer = setTimeout(goToPuzzle, duration);
       return () => clearTimeout(finalTimer);
     }
   }, [currentLine, goToPuzzle, lines]);
