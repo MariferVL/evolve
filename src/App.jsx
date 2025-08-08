@@ -6,6 +6,14 @@ import { AnimatePresence } from "framer-motion";
 import { CommunicationPuzzle } from "./components/CommunicationPuzzle";
 import { PuzzleBriefing } from "./components/PuzzleBriefing";
 
+const communicationPuzzleLines = [
+  "LOCATION: ECHOES OF A PAST CAREER...",
+  "SOURCE: SPEECH THERAPY EXPERIENCE",
+  "ANALYSIS: To build for humans, you must first understand how they connect. That was my mission then, and it's my mission now.",
+  "MISSION: Synchronize the core principles of UI/UX with their root challenges.",
+  "",
+];
+
 /**
  * Main application component.
  * Renders different scenes based on current game state.
@@ -23,9 +31,11 @@ function App() {
       </AnimatePresence>
 
       {/*  Render components based on game state */}
-      {gameState === 'game' && <AltarScene />}
-      {gameState === 'puzzle_briefing' && <PuzzleBriefing />}
-      {gameState === 'puzzle_oracle' && <CommunicationPuzzle />}
+      {gameState === "game" && <AltarScene />}
+      {gameState === "puzzle_briefing" && (
+        <PuzzleBriefing lines={communicationPuzzleLines} />
+      )}
+      {gameState === "puzzle_oracle" && <CommunicationPuzzle />}
     </>
   );
 }
