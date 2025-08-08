@@ -1,89 +1,40 @@
-import { useState, useEffect, useRef } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, Text } from "@react-three/drei";
-import { Suspense } from "react";
-import { useGameStore } from "../store/useGameStore";
+// CommunicationPuzzle.jsx
+import React, { useEffect, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { PuzzleLayout } from "./PuzzleLayout";
 import { PuzzleUI } from "./PuzzleUI";
+import { useGameStore } from "../store/useGameStore";
 
 /**
- *  LegacyEcho component
- * @description Renders a legacy echo in the communication puzzle scene.
- * @param {*} param0
- * @param {Array} param0.position - The position of the echo in the scene.
- * @param {string} param0.color - The color of the echo.
- * @param {string} param0.label - The label to display above the echo.
- * @returns
- */
-function LegacyEcho({ position, color, label }) {
-  return (
-    <group position={position}>
-      <mesh>
-        <octahedronGeometry args={[0.5, 0]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={1.5}
-          toneMapped={false}
-        />
-      </mesh>
-      <Text
-        position={[0, 0.8, 0]}
-        fontSize={0.25}
-        color="white"
-        anchorY="bottom"
-        maxWidth={2.5}
-        textAlign="center"
-      >
-        {label}
-      </Text>
-    </group>
-  );
-}
-
-/**
- * SyncCatalyst component
- * @description Represents a catalyst in the communication puzzle that can be dragged and dropped.
- * @param {*} param0
- * @param {Array} param0.position - The position of the catalyst in the scene.
- * @param {string} param0.color - The color of the catalyst.
- * @param {string} param0.label - The label to display above the catalyst.
- * @param {Function} param0.onPointerDown - Callback function when the catalyst is clicked.
- * @return
- */
-function SyncCatalyst({ position, color, label, onPointerDown }) {
-  return (
-    <group position={position} onPointerDown={onPointerDown}>
-      <mesh>
-        <boxGeometry args={[1.2, 1.2, 1.2]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
-      </mesh>
-      <Text
-        position={[0, 0, 0.61]}
-        fontSize={0.15}
-        color="white"
-        maxWidth={1}
-        textAlign="center"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {label}
-      </Text>
-    </group>
-  );
-}
-
-/**
- * CommunicationPuzzle component
- * @description The main component for the communication puzzle scene.
- * @returns
+ * CommunicationPuzzle
+ * - Forces a landscape-sized canvas by swapping width/height when needed.
+ * - Centers the canvas and keeps pointer events working.
+ * - Passes computed landscape dimensions to PuzzleLayout for responsive layout.
  */
 export function CommunicationPuzzle() {
+  const [viewport, setViewport] = useState({
+    vw: Math.max(window.innerWidth, window.innerHeight),
+    vh: Math.min(window.innerWidth, window.innerHeight),
+  });
+
+  useEffect(() => {
+    function onResize() {
+      setViewport({
+        vw: Math.max(window.innerWidth, window.innerHeight),
+        vh: Math.min(window.innerWidth, window.innerHeight),
+      });
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const buttonStyle = {
     padding: "10px 25px",
     fontSize: "1rem",
-    color: "#D1FF50",
+    color: "#50d9ffff",
     backgroundColor: "transparent",
-    border: "2px solid #D1FF50",
+    border: "2px solid #50d9ffff",
     borderRadius: "50px",
     cursor: "pointer",
     marginTop: "10px",
@@ -91,144 +42,45 @@ export function CommunicationPuzzle() {
     pointerEvents: "auto",
   };
 
-  // State management for catalysts and dragged catalyst
-  const [catalysts, setCatalysts] = useState([
-    {
-      id: 0,
-      position: [-4, -2.5, 0],
-      color: "#FF00FF",
-      label: "Intuitive UI",
-      isMatched: false,
-    },
-    {
-      id: 1,
-      position: [0, -2.5, 0],
-      color: "#9400D3",
-      label: "Clear Communication",
-      isMatched: false,
-    },
-    {
-      id: 2,
-      position: [4, -2.5, 0],
-      color: "#00FFFF",
-      label: "Accessible Design",
-      isMatched: false,
-    },
-  ]);
-  // State for the currently dragged catalyst
-  const [draggedCatalyst, setDraggedCatalyst] = useState(null);
-  // Echoes that need to be matched with catalysts
-  const echoes = [
-    {
-      id: 2,
-      position: [-4, 1.5, 0],
-      color: "#00FFFF",
-      label: "Complex User Needs",
-    },
-    {
-      id: 0,
-      position: [0, 1.5, 0],
-      color: "#FF00FF",
-      label: "User Frustration",
-    },
-    {
-      id: 1,
-      position: [4, 1.5, 0],
-      color: "#9400D3",
-      label: "Ambiguous Feedback",
-    },
-  ];
-  // State for the game status message
   const [gameStatus, setGameStatus] = useState("");
-  // Function to return to the altar, defined in the game store
-  const returnToAltar = useGameStore((state) => state.returnToAltar);
+  const returnToAltar = useGameStore((s) => s.returnToAltar);
 
-  /**
-   * Camera controller to set the initial camera position
-   * @returns
-   */
-  function CameraController() {
-    const { camera } = useThree();
-    useEffect(() => {
-      camera.position.set(0, 0, 8);
-      camera.lookAt(0, 0, 0);
-      camera.updateProjectionMatrix();
-    }, [camera]);
-    return null;
-  }
-
-  useEffect(() => {
-    const allMatched = catalysts.every((c) => c.isMatched);
-    if (allMatched) {
-      setGameStatus("SYNCHRONIZATION COMPLETE: ESSENCE ACQUIRED");
-    }
-  }, [catalysts]);
-
-  // Handle pointer move event to update the position of the dragged catalyst
-  const handlePointerMove = (e) => {
-    if (draggedCatalyst === null) return;
-    setCatalysts((currentCatalysts) =>
-      currentCatalysts.map((m) =>
-        m.id === draggedCatalyst
-          ? { ...m, position: [e.point.x, e.point.y, 0.1] }
-          : m
-      )
-    );
+  // container style ensures no scrollbars and centers the swapped-dimension canvas
+  const containerStyle = {
+    position: "relative",
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+    background: "#05050A",
   };
 
-  // Handle pointer up event to check if the catalyst is dropped near the echo
-  const handlePointerUp = () => {
-    if (draggedCatalyst === null) return;
-    const currentModule = catalysts.find((m) => m.id === draggedCatalyst);
-    const targetNode = echoes.find((n) => n.id === draggedCatalyst);
-    const distance = Math.hypot(
-      currentModule.position[0] - targetNode.position[0],
-      currentModule.position[1] - targetNode.position[1]
-    );
-    if (distance < 1.5) {
-      setCatalysts((currentCatalysts) =>
-        currentCatalysts.map((m) =>
-          m.id === draggedCatalyst
-            ? { ...m, position: targetNode.position, isMatched: true }
-            : m
-        )
-      );
-    }
-    setDraggedCatalyst(null);
+  // Canvas style uses the swapped dims: vw is always the longer side (landscape)
+  const canvasStyle = {
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    transform: "translate(-50%, -50%)",
+    width: `${viewport.vw}px`,
+    height: `${viewport.vh}px`,
+    touchAction: "none", // improve touch dragging
   };
 
   return (
-    <div className="scene-container" style={{ position: "relative" }}>
-      <Canvas>
-        <CameraController />
+    <div className="scene-container" style={containerStyle}>
+      <Canvas style={canvasStyle} pixelRatio={Math.min(window.devicePixelRatio, 2)}>
         <color attach="background" args={["#05050A"]} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={2} />
-        <Suspense fallback={null}>
-          {echoes.map((echo) => (
-            <LegacyEcho key={`echo-${echo.id}`} {...echo} />
-          ))}
-          {catalysts.map((cat) => (
-            <SyncCatalyst
-              key={`cat-${cat.id}`}
-              {...cat}
-              onPointerDown={
-                !cat.isMatched
-                  ? (e) => {
-                      e.stopPropagation();
-                      setDraggedCatalyst(cat.id);
-                    }
-                  : null
-              }
-            />
-          ))}
-        </Suspense>
-        <mesh onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-          <planeGeometry args={[30, 20]} />
-          <meshStandardMaterial transparent opacity={0} />
-        </mesh>
+        <ambientLight intensity={0.6} />
+        <pointLight position={[10, 10, 10]} intensity={1.6} />
+
+        <PuzzleLayout
+          setGameStatus={setGameStatus}
+          landscapeWidth={viewport.vw}
+          landscapeHeight={viewport.vh}
+        />
+
         <OrbitControls enableZoom={false} enableRotate={false} />
       </Canvas>
+
       <PuzzleUI
         title="Constellation I: The Interface Core"
         subtitle="Match the solution to the user challenge."

@@ -2,9 +2,18 @@ import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Text } from "@react-three/drei";
 
+/**
+ *  LegacyEcho component renders an echo with a label.
+ *  @param {Object} param0 - The properties for the echo.
+ *  @param {Array} param0.position - The position of the echo in 3D space.
+ *  @param {string} param0.color - The color of the echo.
+ *  @param {string} param0.label - The label text for the echo.
+ *  @returns {JSX.Element} The rendered echo component.
+ */
 function LegacyEcho({ position, color, label }) {
   return (
     <group position={position}>
+      // Create an octahedron geometry for the echo
       <mesh>
         <octahedronGeometry args={[0.5, 0]} />
         <meshStandardMaterial
@@ -14,6 +23,7 @@ function LegacyEcho({ position, color, label }) {
           toneMapped={false}
         />
       </mesh>
+      // Add a text label above the echo
       <Text
         position={[0, 0.8, 0]}
         fontSize={0.25}
@@ -28,21 +38,28 @@ function LegacyEcho({ position, color, label }) {
   );
 }
 
+/**
+ * SyncCatalyst component renders a catalyst box with a label.
+ * @param {Object} param
+ * @param {Array} param.position - The position of the catalyst in 3D space.
+ * @param {string} param.color - The color of the catalyst.
+ * @param {string} param.label - The label text for the catalyst.
+ * @param {Function} param.onPointerDown - Callback for pointer down event.
+ * @returns {JSX.Element} The rendered catalyst component.
+ */
 function SyncCatalyst({ position, color, label, onPointerDown }) {
   return (
-    // Usamos <group> para que el texto y el cubo se muevan juntos
     <group position={position} onPointerDown={onPointerDown}>
       <mesh>
         <boxGeometry args={[1.2, 1.2, 1.2]} />
         <meshStandardMaterial color={color} roughness={0.5} />
       </mesh>
-      {/* Este Text ahora se renderiza "pegado" a la cara frontal del cubo */}
       <Text
-        position={[0, 0, 0.61]} // Posición justo enfrente de la cara del cubo
+        position={[0, 0, 0.61]}
         rotation={[0, 0, 0]}
         fontSize={0.15}
         color="white"
-        maxWidth={1} // Ancho máximo para que el texto se ajuste
+        maxWidth={1}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
@@ -53,53 +70,47 @@ function SyncCatalyst({ position, color, label, onPointerDown }) {
   );
 }
 
+/** * LegacyPuzzle component implements a drag-and-drop puzzle game.
+ * Players match catalysts to their corresponding echoes.
+ * @returns {JSX.Element} The rendered puzzle component.
+ */
 export function LegacyPuzzle() {
-  // 1. NUEVOS TEXTOS ENFOCADOS EN FRONTEND Y UX
+  const [draggedCatalyst, setDraggedCatalyst] = useState(null);
+
   const [catalysts, setCatalysts] = useState([
-    {
-      id: 0,
-      position: [-3, -2, 0],
-      color: "#FF00FF",
-      label: "Component-Based Architecture",
-    },
+    { id: 0, position: [-3, -2, 0], color: "#FF00FF", label: "Intuitive UI" },
     {
       id: 1,
       position: [0, -2, 0],
       color: "#9400D3",
-      label: "State Management",
+      label: "Clear Communication",
     },
     {
       id: 2,
       position: [3, -2, 0],
       color: "#00FFFF",
-      label: "Accessible Design (A11y)",
+      label: "Accessible Design",
     },
   ]);
 
-  const [draggedCatalyst, setDraggedCatalyst] = useState(null);
-
+  // Echoes that the player needs to match with catalysts
   const echoes = [
     {
       id: 2,
       position: [-3, 1, 0],
       color: "#00FFFF",
-      label: "Complex UI for All Players",
+      label: "Complex User Needs",
     },
-    {
-      id: 0,
-      position: [0, 1, 0],
-      color: "#FF00FF",
-      label: "Unscalable Codebase",
-    },
+    { id: 0, position: [0, 1, 0], color: "#FF00FF", label: "User Frustration" },
     {
       id: 1,
       position: [3, 1, 0],
       color: "#9400D3",
-      label: "Inconsistent User Data",
+      label: "Ambiguous Feedback",
     },
   ];
 
-  // La lógica de drag-and-drop no cambia
+  // Handle pointer move event to update catalyst position
   const handlePointerMove = (e) => {
     if (draggedCatalyst === null) return;
     setCatalysts((currentCatalysts) =>
@@ -111,6 +122,7 @@ export function LegacyPuzzle() {
     );
   };
 
+  // Handle pointer up event to check if catalyst is close to its echo
   const handlePointerUp = () => {
     if (draggedCatalyst === null) return;
     const currentCatalyst = catalysts.find((m) => m.id === draggedCatalyst);
