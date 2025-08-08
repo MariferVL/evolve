@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Text, PerspectiveCamera } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/three";
+import { useState, useEffect, useRef } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { OrbitControls, Text } from "@react-three/drei";
+import { Suspense } from "react";
+import { useGameStore } from "../store/useGameStore";
+import { PuzzleUI } from "./PuzzleUI";
 
 /**
  *  LegacyEcho component
@@ -72,47 +74,97 @@ function SyncCatalyst({ position, color, label, onPointerDown }) {
 
 /**
  * CommunicationPuzzle component
- * @description Renders the communication puzzle scene where users can match catalysts to echoes.
+ * @description The main component for the communication puzzle scene.
  * @returns
  */
 export function CommunicationPuzzle() {
-  // State to manage catalysts in the scene
+  const buttonStyle = {
+    padding: "10px 25px",
+    fontSize: "1rem",
+    color: "#D1FF50",
+    backgroundColor: "transparent",
+    border: "2px solid #D1FF50",
+    borderRadius: "50px",
+    cursor: "pointer",
+    marginTop: "10px",
+    transition: "all 0.3s ease",
+    pointerEvents: "auto",
+  };
+
+  // State management for catalysts and dragged catalyst
   const [catalysts, setCatalysts] = useState([
-    { id: 0, position: [-3, -2, 0], color: "#FF00FF", label: "Intuitive UI" },
+    {
+      id: 0,
+      position: [-4, -2.5, 0],
+      color: "#FF00FF",
+      label: "Intuitive UI",
+      isMatched: false,
+    },
     {
       id: 1,
-      position: [0, -2, 0],
+      position: [0, -2.5, 0],
       color: "#9400D3",
       label: "Clear Communication",
+      isMatched: false,
     },
     {
       id: 2,
-      position: [3, -2, 0],
+      position: [4, -2.5, 0],
       color: "#00FFFF",
       label: "Accessible Design",
+      isMatched: false,
     },
   ]);
-
-  // State to track which catalyst is being dragged
+  // State for the currently dragged catalyst
   const [draggedCatalyst, setDraggedCatalyst] = useState(null);
   // Echoes that need to be matched with catalysts
   const echoes = [
     {
       id: 2,
-      position: [-3, 1, 0],
+      position: [-4, 1.5, 0],
       color: "#00FFFF",
       label: "Complex User Needs",
     },
-    { id: 0, position: [0, 1, 0], color: "#FF00FF", label: "User Frustration" },
+    {
+      id: 0,
+      position: [0, 1.5, 0],
+      color: "#FF00FF",
+      label: "User Frustration",
+    },
     {
       id: 1,
-      position: [3, 1, 0],
+      position: [4, 1.5, 0],
       color: "#9400D3",
       label: "Ambiguous Feedback",
     },
   ];
+  // State for the game status message
+  const [gameStatus, setGameStatus] = useState("");
+  // Function to return to the altar, defined in the game store
+  const returnToAltar = useGameStore((state) => state.returnToAltar);
 
-  // Handlers for pointer events to manage dragging of catalysts
+  /**
+   * Camera controller to set the initial camera position
+   * @returns
+   */
+  function CameraController() {
+    const { camera } = useThree();
+    useEffect(() => {
+      camera.position.set(0, 0, 8);
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+    }, [camera]);
+    return null;
+  }
+
+  useEffect(() => {
+    const allMatched = catalysts.every((c) => c.isMatched);
+    if (allMatched) {
+      setGameStatus("SYNCHRONIZATION COMPLETE: ESSENCE ACQUIRED");
+    }
+  }, [catalysts]);
+
+  // Handle pointer move event to update the position of the dragged catalyst
   const handlePointerMove = (e) => {
     if (draggedCatalyst === null) return;
     setCatalysts((currentCatalysts) =>
@@ -124,102 +176,66 @@ export function CommunicationPuzzle() {
     );
   };
 
-  // Handler for pointer up event to check if the catalyst is close enough to an echo
+  // Handle pointer up event to check if the catalyst is dropped near the echo
   const handlePointerUp = () => {
     if (draggedCatalyst === null) return;
-    const currentCatalyst = catalysts.find((m) => m.id === draggedCatalyst);
-    const targetEcho = echoes.find((n) => n.id === draggedCatalyst);
+    const currentModule = catalysts.find((m) => m.id === draggedCatalyst);
+    const targetNode = echoes.find((n) => n.id === draggedCatalyst);
     const distance = Math.hypot(
-      currentCatalyst.position[0] - targetEcho.position[0],
-      currentCatalyst.position[1] - targetEcho.position[1]
+      currentModule.position[0] - targetNode.position[0],
+      currentModule.position[1] - targetNode.position[1]
     );
-    if (distance < 1) {
+    if (distance < 1.5) {
       setCatalysts((currentCatalysts) =>
         currentCatalysts.map((m) =>
-          m.id === draggedCatalyst ? { ...m, position: targetEcho.position } : m
+          m.id === draggedCatalyst
+            ? { ...m, position: targetNode.position, isMatched: true }
+            : m
         )
       );
     }
     setDraggedCatalyst(null);
   };
 
-  // Animation for the camera position using react-spring
-  const [spring, api] = useSpring(() => ({
-    position: [0, 0, 25], 
-    config: { mass: 1, tension: 120, friction: 50 },
-  }));
-
-  useEffect(() => {
-    // Move the camera to a better position for the puzzle
-    api.start({ position: [0, 0, 10] });
-  }, [api]);
-
   return (
-    <div className="scene-container">
+    <div className="scene-container" style={{ position: "relative" }}>
       <Canvas>
-        <animated.group position={spring.position}>
-          <PerspectiveCamera makeDefault fov={50} />
-        </animated.group>
-
+        <CameraController />
         <color attach="background" args={["#05050A"]} />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={2} />
-
-        <Text
-          position={[0, 3.5, 0]}
-          fontSize={0.35}
-          color="white"
-          letterSpacing={0.1}
-          textAlign="center"
-          anchorY="bottom"
-          opacity={0}
-          material-opacity={0}
-        >
-          <animated.meshBasicMaterial
-            transparent
-            opacity={spring.position.to((p) => (10 - p[2]) / 5)}
-          />
-          ECHOES OF SPEECH THERAPY
-        </Text>
-
-        <Text
-          position={[0, 2.8, 0]}
-          fontSize={0.25}
-          color="#888"
-          textAlign="center"
-          maxWidth={5}
-          anchorY="bottom"
-          opacity={0}
-          material-opacity={0}
-        >
-          <animated.meshBasicMaterial
-            transparent
-            opacity={spring.position.to((p) => (8 - p[2]) / 4)}
-          />
-          Decoding human communication taught me how to build better interfaces.
-        </Text>
-
-        {echoes.map((echo) => (
-          <LegacyEcho key={`echo-${echo.id}`} {...echo} />
-        ))}
-        {catalysts.map((cat) => (
-          <SyncCatalyst
-            key={`cat-${cat.id}`}
-            {...cat}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              setDraggedCatalyst(cat.id);
-            }}
-          />
-        ))}
-
+        <Suspense fallback={null}>
+          {echoes.map((echo) => (
+            <LegacyEcho key={`echo-${echo.id}`} {...echo} />
+          ))}
+          {catalysts.map((cat) => (
+            <SyncCatalyst
+              key={`cat-${cat.id}`}
+              {...cat}
+              onPointerDown={
+                !cat.isMatched
+                  ? (e) => {
+                      e.stopPropagation();
+                      setDraggedCatalyst(cat.id);
+                    }
+                  : null
+              }
+            />
+          ))}
+        </Suspense>
         <mesh onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}>
-          <planeGeometry args={[20, 20]} />
+          <planeGeometry args={[30, 20]} />
           <meshStandardMaterial transparent opacity={0} />
         </mesh>
-
         <OrbitControls enableZoom={false} enableRotate={false} />
       </Canvas>
+      <PuzzleUI
+        title="Constellation I: The Interface Core"
+        subtitle="Match the solution to the user challenge."
+        status={gameStatus}
+        buttonStyle={buttonStyle}
+        onReturn={returnToAltar}
+      />
     </div>
   );
 }
