@@ -1,0 +1,55 @@
+/* Root-level styles: set system font stack and dark background for immersive experience */
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #000;
+}
+
+/* Reset body margins and prevent scrollbars for full-screen layout */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+}
+
+/* Ensure root container fills the viewport and hides overflow */
+#root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Shared container styles for both intro and scene views */
+.intro-container,
+.scene-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Make intro video cover the entire container responsively */
+.intro-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* --- Force Landscape Technique ---
+   Rotates the entire root container when device is in portrait mode.
+   This ensures consistent landscape experience across mobile devices.
+*/
+@media (orientation: portrait) {
+  #root {
+    width: 100vh;
+    height: 100vw;
+    
+    transform-origin: center;
+    transform: rotate(90deg);
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
