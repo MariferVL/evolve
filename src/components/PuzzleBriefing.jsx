@@ -40,24 +40,19 @@ const textContainerStyle = {
   padding: "20px",
 };
 
-/** 
- * PuzzleBriefing component displays a briefing screen with animated text.
- * It transitions to the puzzle scene after displaying all lines.
- * @returns {JSX.Element} The rendered briefing component.    
+/**
+ * PuzzleBriefing component displays a briefing video and text lines sequentially.
+ * It automatically transitions through the lines and navigates to the puzzle screen when done.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.lines - Array of text lines to display in the briefing.
+ * @returns {JSX.Element} The PuzzleBriefing component.
  */
-export function PuzzleBriefing() {
+export function PuzzleBriefing({ lines }) {
   const goToPuzzle = useGameStore((state) => state.goToPuzzle);
-  const briefingLines = [
-    "LOCATION: ECHOES OF A PAST CAREER...",
-    "SOURCE: SPEECH THERAPY EXPERIENCE",
-    "ANALYSIS: Decoding human communication is the key to building better interfaces.",
-    "MISSION: FOCUS THE MEMORY.",
-    "",
-  ];
   const [currentLine, setCurrentLine] = useState(0);
 
   useEffect(() => {
-    if (currentLine < briefingLines.length - 1) {
+    if (currentLine < lines.length - 1) {
       const timer = setTimeout(() => {
         setCurrentLine(currentLine + 1);
       }, 2500);
@@ -66,14 +61,13 @@ export function PuzzleBriefing() {
       const finalTimer = setTimeout(goToPuzzle, 2500);
       return () => clearTimeout(finalTimer);
     }
-  }, [currentLine, goToPuzzle]);
+  }, [currentLine, goToPuzzle, lines]);
 
   return (
     <div style={briefingStyle}>
       <video style={videoStyle} src={briefingVideo} autoPlay muted loop />
-
       <div style={textContainerStyle}>
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           <motion.p
             key={currentLine}
             initial={{ opacity: 0, filter: "blur(10px)" }}
@@ -88,7 +82,7 @@ export function PuzzleBriefing() {
               minHeight: "50px",
             }}
           >
-            {briefingLines[currentLine]}
+            {lines[currentLine]}
           </motion.p>
         </AnimatePresence>
       </div>
