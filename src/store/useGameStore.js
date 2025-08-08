@@ -12,7 +12,8 @@ export const useGameStore = create((set) => ({
   essences: [],
   artifacts: [],
 
-  goToPuzzle: () => set({ gameState: "puzzle_oracle" }),
+  goToBriefing: () => set({ gameState: 'puzzle_briefing' }),
+  goToPuzzle: () => set({ gameState: 'puzzle_oracle' }),
 
   // Transition to intro scene
   showIntro: () => set({ gameState: "intro" }),
