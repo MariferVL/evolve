@@ -1,5 +1,4 @@
-// CommunicationPuzzle.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { PuzzleLayout } from "./PuzzleLayout";
@@ -11,6 +10,7 @@ import { useGameStore } from "../store/useGameStore";
  * - Forces a landscape-sized canvas by swapping width/height when needed.
  * - Centers the canvas and keeps pointer events working.
  * - Passes computed landscape dimensions to PuzzleLayout for responsive layout.
+ * @returns {JSX.Element}
  */
 export function CommunicationPuzzle() {
   const [viewport, setViewport] = useState({
@@ -29,6 +29,7 @@ export function CommunicationPuzzle() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Button style for the return button in PuzzleUI
   const buttonStyle = {
     padding: "10px 25px",
     fontSize: "1rem",
@@ -42,7 +43,9 @@ export function CommunicationPuzzle() {
     pointerEvents: "auto",
   };
 
+  // Game status state to track puzzle completion
   const [gameStatus, setGameStatus] = useState("");
+  // Function to return to the altar scene
   const returnToAltar = useGameStore((s) => s.returnToAltar);
 
   // container style ensures no scrollbars and centers the swapped-dimension canvas

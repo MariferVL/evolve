@@ -1,11 +1,14 @@
-// PuzzleUI.jsx
-import React from "react";
-
 /**
- * PuzzleUI
- * - Overlay UI rendered on top of the canvas.
- * - Pointer events are disabled by default except for interactive buttons (pointerEvents auto on buttons).
- * - Uses monospace as requested, but sizes are tuned for readability on mobile-landscape.
+ * PuzzleUI Component
+ * Displays a puzzle interface with a title, subtitle, status message, and a return button.
+ * @param {Object} props - Component properties
+ * @param {string} props.title - The title of the puzzle.
+ * @param {string} props.subtitle - The subtitle of the puzzle.
+ * @param {string} [props.status] - The current status of the puzzle, displayed
+ * at the bottom.
+ * @param {Function} props.onReturn - Callback function to handle return button click.
+ * @param {Object} [props.buttonStyle] - Custom style for the return button.
+ * @returns {JSX.Element} - The PuzzleUI component.
  */
 export function PuzzleUI({ title, subtitle, status, onReturn, buttonStyle }) {
   return (
@@ -31,8 +34,24 @@ export function PuzzleUI({ title, subtitle, status, onReturn, buttonStyle }) {
           pointerEvents: "none",
         }}
       >
-        <h1 style={{ fontSize: "clamp(18px, 2.2vw, 26px)", margin: 0, opacity: 0.95 }}>{title}</h1>
-        <p style={{ fontSize: "clamp(12px, 1.4vw, 16px)", margin: 0, color: "#aaa" }}>{subtitle}</p>
+        <h1
+          style={{
+            fontSize: "clamp(18px, 2.2vw, 26px)",
+            margin: 0,
+            opacity: 0.95,
+          }}
+        >
+          {title}
+        </h1>
+        <p
+          style={{
+            fontSize: "clamp(12px, 1.4vw, 16px)",
+            margin: 0,
+            color: "#aaa",
+          }}
+        >
+          {subtitle}
+        </p>
       </div>
 
       {status && (
@@ -45,7 +64,13 @@ export function PuzzleUI({ title, subtitle, status, onReturn, buttonStyle }) {
             pointerEvents: "none",
           }}
         >
-          <p style={{ fontSize: "clamp(16px, 2.4vw, 22px)", color: "#D1FF50", textShadow: "0 0 10px #D1FF50" }}>
+          <p
+            style={{
+              fontSize: "clamp(16px, 2.4vw, 22px)",
+              color: "#D1FF50",
+              textShadow: "0 0 10px #D1FF50",
+            }}
+          >
             {status}
           </p>
           <div style={{ pointerEvents: "auto", display: "inline-block" }}>
