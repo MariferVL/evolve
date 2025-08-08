@@ -3,7 +3,7 @@ import { Intro } from "./components/Intro";
 import { AltarScene } from "./components/AltarScene";
 import { SplashScreen } from "./components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
-import { OraclePuzzle } from "./components/OraclePuzzle";
+import { LegacyPuzzle } from "./components/LegacyPuzzle";
 
 /**
  * Main application component.
@@ -23,7 +23,7 @@ function App() {
 
       {/* Render main game scene when game starts */}
       {gameState === "game" && <AltarScene />}
-      {gameState === "puzzle_oracle" && <OraclePuzzle />}
+      {gameState === "puzzle_oracle" && <LegacyPuzzle />}
     </>
   );
 }
