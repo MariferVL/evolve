@@ -3,6 +3,7 @@ import { Intro } from "./components/Intro";
 import { AltarScene } from "./components/AltarScene";
 import { SplashScreen } from "./components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
+import { OraclePuzzle } from "./components/OraclePuzzle";
 
 /**
  * Main application component.
@@ -16,12 +17,13 @@ function App() {
     <>
       {/* AnimatePresence enables smooth transitions between scenes */}
       <AnimatePresence mode="wait">
-        {gameState === 'splash' && <SplashScreen key="splash" />}
-        {gameState === 'intro' && <Intro key="intro" />}
+        {gameState === "splash" && <SplashScreen key="splash" />}
+        {gameState === "intro" && <Intro key="intro" />}
       </AnimatePresence>
-      
+
       {/* Render main game scene when game starts */}
-      {gameState === 'game' && <AltarScene />}
+      {gameState === "game" && <AltarScene />}
+      {gameState === "puzzle_oracle" && <OraclePuzzle />}
     </>
   );
 }
