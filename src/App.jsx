@@ -3,7 +3,8 @@ import { Intro } from "./components/Intro";
 import { AltarScene } from "./components/AltarScene";
 import { SplashScreen } from "./components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
-import { LegacyPuzzle } from "./components/LegacyPuzzle";
+import { CommunicationPuzzle } from "./components/CommunicationPuzzle";
+import { PuzzleBriefing } from "./components/PuzzleBriefing";
 
 /**
  * Main application component.
@@ -21,9 +22,10 @@ function App() {
         {gameState === "intro" && <Intro key="intro" />}
       </AnimatePresence>
 
-      {/* Render main game scene when game starts */}
-      {gameState === "game" && <AltarScene />}
-      {gameState === "puzzle_oracle" && <LegacyPuzzle />}
+      {/*  Render components based on game state */}
+      {gameState === 'game' && <AltarScene />}
+      {gameState === 'puzzle_briefing' && <PuzzleBriefing />}
+      {gameState === 'puzzle_oracle' && <CommunicationPuzzle />}
     </>
   );
 }
