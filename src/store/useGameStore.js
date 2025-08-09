@@ -4,34 +4,42 @@ import { create } from "zustand";
  * Zustand store for managing game state and inventory.
  * Handles transitions between splash, intro, and game scenes.
  */
-export const useGameStore = create((set) => ({
+export const useGameStore = create((set, get) => ({
   // Initial game state
-  gameState: "puzzle_oracle", 
+  gameState: "intro",
 
   // Inventory arrays for tracking collected items
-  essences: [],
+  essences: [],            
   artifacts: [],
 
-  // Transition functions for different game states
+  // Currently active essence (the one that started the current puzzle)
+  activeEssenceId: null,   // number | null
+
+  // --- game state transitions ---
   goToBriefing: () => set({ gameState: "puzzle_briefing" }),
   goToPuzzle: () => set({ gameState: "puzzle_oracle" }),
-
-  // Return to the altar from the puzzle
   returnToAltar: () => set({ gameState: "game" }),
-
-  // Transition to intro scene
   showIntro: () => set({ gameState: "intro" }),
-
-  // Start the main game scene
   startGame: () => set({ gameState: "game" }),
 
-  // Add a new essence to the inventory
-  addEssence: (essenceName) =>
+  
+  // Called when a player clicks an interactive Essence in the altar to start its puzzle
+  startPuzzle: (essenceId) =>
+    set({
+      activeEssenceId: essenceId,
+      gameState: "puzzle_briefing", 
+    }),
+
+  // Mark an essence as collected (id is numeric). Avoid duplicates.
+  collectEssence: (essenceId) =>
     set((state) => ({
-      essences: [...state.essences, essenceName],
+      essences: state.essences.includes(essenceId)
+        ? state.essences
+        : [...state.essences, essenceId],
+      activeEssenceId: state.activeEssenceId === essenceId ? null : state.activeEssenceId,
     })),
 
-  // Add a new artifact to the inventory
+  // Add a new artifact to the inventory (keeps existing)
   addArtifact: (artifactName) =>
     set((state) => ({
       artifacts: [...state.artifacts, artifactName],

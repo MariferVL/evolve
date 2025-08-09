@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Sparkles, useGLTF } from "@react-three/drei";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Essence } from "./Essence";
+import { useGameStore } from "../store/useGameStore";
 
 function AltarModel() {
   const { scene } = useGLTF("/altar.glb");
@@ -17,6 +18,24 @@ function AltarModel() {
 }
 
 export function AltarScene() {
+  const collectedEssences = useGameStore((s) => s.essences);
+  const essenceDefs = [
+    {
+      id: 0,
+      color: "#8829e7ff",
+      triggerPos: [-2.5, -1, 1],
+      altarPos: [-1.2, -1.6, 0],
+    },
+    { id: 1, color: "#00ffff", triggerPos: [0, -1, 1], altarPos: [0, -1.6, 0] },
+    {
+      id: 2,
+      color: "#ff00ff",
+      triggerPos: [2.5, -1, 1],
+      altarPos: [1.2, -1.6, 0],
+    },
+  ];
+
+
   return (
     <div className="scene-container">
       <Canvas camera={{ position: [0, 4, 18], fov: 50 }}>
@@ -26,7 +45,18 @@ export function AltarScene() {
 
         <Suspense fallback={null}>
           <AltarModel />
-          <Essence position={[0, -1, 0]} color="#8829e7ff" />
+          {essenceDefs.map((def) => {
+            const isCollected = collectedEssences.includes(def.id);
+            return (
+              <Essence
+                key={`essence-${def.id}`}
+                id={def.id}
+                position={isCollected ? def.altarPos : def.triggerPos}
+                color={def.color}
+                interactiveProp={!isCollected}
+              />
+            );
+          })}
         </Suspense>
 
         <Sparkles
@@ -37,10 +67,7 @@ export function AltarScene() {
           color="#e3bbffff"
         />
 
-        <OrbitControls
-          minDistance={20} 
-          maxDistance={60} 
-        />
+        <OrbitControls minDistance={20} maxDistance={60} />
         <EffectComposer>
           <Bloom luminanceThreshold={0.4} intensity={0.8} mipmapBlur />
         </EffectComposer>

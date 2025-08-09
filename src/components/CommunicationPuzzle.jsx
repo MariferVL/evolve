@@ -45,10 +45,31 @@ export function CommunicationPuzzle() {
 
   // Game status state to track puzzle completion
   const [gameStatus, setGameStatus] = useState("");
+
   // Function to return to the altar scene
   const returnToAltar = useGameStore((s) => s.returnToAltar);
 
-  // container style ensures no scrollbars and centers the swapped-dimension canvas
+  const activeEssenceId = useGameStore((s) => s.activeEssenceId);
+  const collectEssence = useGameStore((s) => s.collectEssence);
+
+  useEffect(() => {
+    // listen for the exact victory string emitted by PuzzleLayout
+    if (gameStatus === "SYNCHRONIZATION COMPLETE: ESSENCE ACQUIRED") {
+      // mark essence as collected immediately (so altar scene will know)
+      if (activeEssenceId !== null && activeEssenceId !== undefined) {
+        collectEssence(activeEssenceId);
+      }
+
+      // keep the victory message visible for 2 seconds, then return to altar
+      const timer = setTimeout(() => {
+        returnToAltar();
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [gameStatus, activeEssenceId, collectEssence, returnToAltar]);
+
+  // Container style ensures no scrollbars and centers the swapped-dimension canvas
   const containerStyle = {
     position: "relative",
     width: "100vw",
@@ -70,7 +91,8 @@ export function CommunicationPuzzle() {
 
   return (
     <div className="scene-container" style={containerStyle}>
-      <Canvas style={canvasStyle} pixelRatio={Math.min(window.devicePixelRatio, 2)}>
+      <Canvas style={canvasStyle} dpr={Math.min(window.devicePixelRatio, 2)}>
+
         <color attach="background" args={["#05050A"]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={1.6} />
