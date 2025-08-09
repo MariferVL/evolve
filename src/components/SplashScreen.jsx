@@ -14,7 +14,7 @@ const splashStyle = {
   height: "100%",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "center",
+  justifyContent: 'flex-end',
   alignItems: "center",
   backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${splashBgImage})`,
   backgroundSize: "cover",
@@ -47,13 +47,13 @@ const subtitleStyle = {
 /** Button styling: vibrant, rounded, and responsive */
 const buttonStyle = {
   padding: "15px 30px",
+  marginBottom: "80px",
   fontSize: "1.5rem",
-  color: "#D1FF50",
+  color: "#bbe2f2ff",
   backgroundColor: "transparent",
-  border: "2px solid #D1FF50",
+  border: "2px solid #bbe2f2ff",
   borderRadius: "50px",
   cursor: "pointer",
-  marginTop: "30px",
   transition: "all 0.3s ease",
   minWidth: "220px",
   textAlign: "center",
@@ -150,7 +150,7 @@ export function SplashScreen() {
   const handleMouseEnter = (e) => {
     if (isLoading) return;
     playSound(hoverBuffer);
-    e.currentTarget.style.backgroundColor = "rgba(209, 255, 80, 0.2)";
+    e.currentTarget.style.backgroundColor = "rgba(193, 240, 253, 0.2)";
   };
 
   /** Resets button background on hover exit */
@@ -164,8 +164,8 @@ export function SplashScreen() {
       style={splashStyle}
       exit={{ opacity: 0, transition: { duration: 1 } }} // Smooth fade-out
     >
-      <h1 style={titleStyle}>Evolve: Marifer’s Legacy</h1>
-      <p style={subtitleStyle}>An interactive journey</p>
+      {/* <h1 style={titleStyle}>Evolve: Marifer’s Legacy</h1>
+      <p style={subtitleStyle}>An interactive journey</p> */}
       <button
         style={buttonStyle}
         onClick={handleStart}
