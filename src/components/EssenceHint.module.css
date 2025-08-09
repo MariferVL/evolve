@@ -1,0 +1,46 @@
+@keyframes hintPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(120, 80, 255, 0.12);
+  }
+
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 28px rgba(120, 80, 255, 0.18);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(120, 80, 255, 0.12);
+  }
+}
+
+.root {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.hintButton {
+  /* estilos base */
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.hintButton:active {
+  transform: translateY(1px);
+}
+
+.hintButton:focus {
+  box-shadow: 0 10px 30px rgba(120, 80, 255, 0.18);
+}
+
+@media (max-width: 1000px) {
+  .root {
+    top: 6% !important;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

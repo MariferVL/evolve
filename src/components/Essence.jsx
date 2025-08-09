@@ -18,7 +18,7 @@ import { useGameStore } from "../store/useGameStore";
 export function Essence({
   id = 0,
   position = [0, 0, 0],
-  color = "#888",
+  color = "#fafabe",
   interactiveProp = undefined,
 }) {
   const meshRef = useRef();
@@ -57,7 +57,9 @@ export function Essence({
     >
       <icosahedronGeometry args={[interactive ? 0.5 : 0.45, 0]} />
       <meshStandardMaterial
-        color={color}
+        color= {color}
+        transparent
+        opacity={0.9}
         emissive={color}
         emissiveIntensity={interactive ? 2 : 0.8}
         toneMapped={false}
