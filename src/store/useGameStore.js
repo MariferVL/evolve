@@ -6,7 +6,7 @@ import { create } from "zustand";
  */
 export const useGameStore = create((set, get) => ({
   // Initial game state
-  gameState: "intro",
+  gameState: "splash", // "splash" | "intro" | "game" | "puzzle_briefing" | "puzzle_oracle"
 
   // Inventory arrays for tracking collected items
   essences: [],            

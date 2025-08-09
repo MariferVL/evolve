@@ -35,7 +35,6 @@ export function AltarScene() {
     },
   ];
 
-
   return (
     <div className="scene-container">
       <Canvas camera={{ position: [0, 4, 18], fov: 50 }}>
@@ -45,18 +44,45 @@ export function AltarScene() {
 
         <Suspense fallback={null}>
           <AltarModel />
-          {essenceDefs.map((def) => {
-            const isCollected = collectedEssences.includes(def.id);
-            return (
-              <Essence
-                key={`essence-${def.id}`}
-                id={def.id}
-                position={isCollected ? def.altarPos : def.triggerPos}
-                color={def.color}
-                interactiveProp={!isCollected}
-              />
+
+          {/* Render collected essences as static altar objects, and only one interactive trigger: the next uncollected essence. */}
+          {(() => {
+            const collectedSet = new Set(collectedEssences);
+
+            // All collected placed on altar (static)
+            const collectedDefs = essenceDefs.filter((d) =>
+              collectedSet.has(d.id)
             );
-          })}
+
+            // Next uncollected (first in order) becomes the single interactive trigger
+            const nextUncollected = essenceDefs.find(
+              (d) => !collectedSet.has(d.id)
+            );
+
+            return (
+              <>
+                {collectedDefs.map((def) => (
+                  <Essence
+                    key={`essence-collected-${def.id}`}
+                    id={def.id}
+                    position={def.altarPos}
+                    color={def.color}
+                    interactiveProp={false}
+                  />
+                ))}
+
+                {nextUncollected && (
+                  <Essence
+                    key={`essence-active-${nextUncollected.id}`}
+                    id={nextUncollected.id}
+                    position={nextUncollected.triggerPos}
+                    color={nextUncollected.color}
+                    interactiveProp={true}
+                  />
+                )}
+              </>
+            );
+          })()}
         </Suspense>
 
         <Sparkles

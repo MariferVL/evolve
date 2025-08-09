@@ -86,13 +86,12 @@ export function CommunicationPuzzle() {
     transform: "translate(-50%, -50%)",
     width: `${viewport.vw}px`,
     height: `${viewport.vh}px`,
-    touchAction: "none", // improve touch dragging
+    touchAction: "none",
   };
 
   return (
     <div className="scene-container" style={containerStyle}>
       <Canvas style={canvasStyle} dpr={Math.min(window.devicePixelRatio, 2)}>
-
         <color attach="background" args={["#05050A"]} />
         <ambientLight intensity={0.6} />
         <pointLight position={[10, 10, 10]} intensity={1.6} />
