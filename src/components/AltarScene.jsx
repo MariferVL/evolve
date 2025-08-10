@@ -39,39 +39,52 @@ export function AltarScene() {
   const essenceDefs = [
     {
       id: 0,
-      color: "#fafabeff",
+      color: "#f9f993",
+      transparent: true,
+      opacity: 1,
       triggerPos: [-2.5, -1, 1],
       altarPos: [-1.2, -1.6, 0],
     },
-    { id: 1, color: "#00ffff", triggerPos: [0, -1, 1], altarPos: [0, -1.6, 0] },
+    {
+      id: 1,
+      color: "#00ffff",
+      transparent: false,
+      opacity: 1,
+      triggerPos: [0, -1, 1],
+      altarPos: [0, -1.6, 0],
+    },
     {
       id: 2,
       color: "#ff00ff",
+      transparent: false,
+      opacity: 1,
       triggerPos: [2.5, -1, 1],
       altarPos: [1.2, -1.6, 0],
     },
   ];
   // State to control the essence hint visibility
   const [showEssenceHint, setShowEssenceHint] = useState(true);
+
+  const [hintDismissed, setHintDismissed] = useState(false);
+
   // Find the next uncollected essence definition
   const nextUncollected = essenceDefs.find(
     (d) => !collectedEssences.includes(d.id)
   );
-  // Effect to show the hint for the next uncollected essence
+
+  // Effect to update the hint visibility based on collected essences
   useEffect(() => {
-    if (!nextUncollected) {
+    if (!nextUncollected || hintDismissed) {
       setShowEssenceHint(false);
     } else {
       setShowEssenceHint(true);
     }
-  }, [collectedEssences, nextUncollected]);
+  }, [collectedEssences, nextUncollected, hintDismissed]);
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
     window.matchMedia &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  console.log({ showEssenceHint, nextUncollected });
 
   return (
     <div className="scene-container">
@@ -139,7 +152,7 @@ export function AltarScene() {
       <EssenceHint
         show={showEssenceHint}
         nextUncollected={nextUncollected}
-        onDismiss={() => setShowEssenceHint(false)}
+        onDismiss={() => setHintDismissed(true)}
         prefersReducedMotion={prefersReducedMotion}
       />
     </div>

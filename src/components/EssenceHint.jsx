@@ -1,4 +1,5 @@
 import styles from "./EssenceHint.module.css";
+import { MiniEssence } from "./MiniEssence";
 
 /**
  * EssenceHint Component
@@ -26,29 +27,8 @@ export function EssenceHint({
       className={styles.root}
     >
       <div className={styles.panel}>
-        {/* Orb animado */}
-        <div
-          aria-hidden="true"
-          className={`${styles.orb} ${
-            !prefersReducedMotion ? styles.pulse : ""
-          }`}
-        >
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <defs>
-              <radialGradient id="g1" cx="50%" cy="30%">
-                <stop offset="0%" stopColor="#E6FFFF" stopOpacity="0.95" />
-                <stop offset="65%" stopColor="#8829E7" stopOpacity="0.55" />
-                <stop offset="100%" stopColor="#00202A" stopOpacity="0.05" />
-              </radialGradient>
-            </defs>
-            <circle cx="12" cy="12" r="6.2" fill="url(#g1)" />
-          </svg>
+        <div className={styles.orb} aria-hidden="true">
+          <MiniEssence color={nextUncollected.color} />
         </div>
 
         <div className={styles.content}>
